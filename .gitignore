@@ -1,0 +1,22 @@
+# Credentials and secrets
+credentials.json
+.env
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.ipynb_checkpoints/
+
+# IDE and OS
+.vscode/
+.idea/
+.DS_Store
+*.swp
+*.swo
+
+# Debug and generated files
+*.debug.json
