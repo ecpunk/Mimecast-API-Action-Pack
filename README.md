@@ -1,6 +1,6 @@
-# Mimecast API Action Pack
+# Mimecast API Action Pack (Human Guide)
 
-This bundle gives humans and AI a ready-to-use reference plus starter scripts to call Mimecast APIs.
+This pack provides a curated API reference (`api-reference.json`) and starter scripts so you can quickly call Mimecast APIs from PowerShell or Python.
 
 ## Contents
 - `api-reference.json` — 257 endpoints with name, category, method, path, description, parameters, url, last_updated.
@@ -8,18 +8,28 @@ This bundle gives humans and AI a ready-to-use reference plus starter scripts to
 - `examples/powershell-basic.ps1` — load JSON, select endpoint, call it with retry/backoff.
 - `examples/python-basic.py` — same flow in Python `requests`.
 
+## Prerequisites
+- A Mimecast API application with `ClientId` and `ClientSecret`.
+- Access to Mimecast’s API environment and permissions to call the selected endpoints.
+- Recommended: VS Code with PowerShell or Python extensions.
+
+Refer to Mimecast’s official documentation to set up API credentials:
+https://developer.services.mimecast.com/
+
 ## Quick start
 1) Copy `credentials.json.template` to `credentials.json` and set `ClientId` / `ClientSecret`.
-2) Open `api-reference.json` to find the endpoint you need (or search programmatically).
-3) Run one of the example scripts and adjust `target_method`/`target_path`.
+2) Ensure you have an access token (bearer) available. You can set it via environment variable `MIMECAST_TOKEN` or implement a token acquisition step in your script.
+3) Open `api-reference.json` to find the endpoint you need (or search programmatically).
+4) Run one of the example scripts and adjust `TargetMethod`/`TargetPath`.
 
-## VS Code + AI flow (fast)
-1) Open this folder in VS Code. Install extensions: PowerShell, Python, and GitHub Copilot Chat (or your AI chat extension).
-2) In the chat, say you have `api-reference.json` open and ask for a script. Examples:
-    - "Make a simple API script to call `POST /api/...` with these parameters: ..."
-    - "Make an API script that pulls all blocked senders, finds common domains, and outputs the top 10." 
-    - "Find the endpoint to list URL blocks and generate a PowerShell script with retries and basic logging."
-3) If the script needs auth, point it to `credentials.json` or provide `MIMECAST_TOKEN` env var. Ask the AI to include retry/backoff for 429/5xx.
+## VS Code workflow
+1) Open this folder in VS Code. Install extensions: PowerShell and/or Python.
+2) Configure your environment:
+    - Set `MIMECAST_TOKEN` in your shell, or
+    - Add a token acquisition step that exchanges `ClientId`/`ClientSecret` for a bearer token.
+3) Run `examples/powershell-basic.ps1` or `examples/python-basic.py` and modify:
+    - `TargetMethod`, `TargetPath`, and request body according to `api-reference.json`.
+4) For resilience, include retry/backoff for 429/5xx responses.
 
 ## Loading the JSON
 **PowerShell**
@@ -37,18 +47,14 @@ endpoint = next(e for e in data['endpoints'] if e['path']=='/api/account/cloud-g
 ```
 
 ## Asking AI for a script
-Provide the JSON and a clear intent. Example prompts:
-1) “Using `api-reference.json`, generate a PowerShell script that calls `POST /api/account/cloud-gateway/v1/emergency-contact` with these parameters: ... Include headers, auth using `credentials.json`, and basic retry on 429.”
-2) “From `api-reference.json`, find the endpoint to list blocked senders. Generate a Python `requests` script to call it, logging the request/response.”
-3) “Given this payload and `api-reference.json`, produce a PowerShell function that validates required fields from the parameters list before calling the endpoint.”
+If you use an AI assistant, see `AI_GUIDE.md` for prompts and assumptions tailored for script generation.
 
-## Lessons learned (for AI + humans)
-- Paths in the docs URLs are reliable; use the `path` and `method` from the JSON as the source of truth.
-- Categories are normalized; do not attempt to infer from URL fragments.
-- Descriptions/parameters are best-effort from the docs DOM; handle missing/optional fields defensively.
-- Include retry/backoff for 429/5xx; Mimecast may throttle.
-- Default auth flow: client ID/secret to get a token, then bearer token in `Authorization` header.
-- Keep user-agent simple; avoid noisy headers.
+## Notes & best practices
+- Use `path` and `method` from `api-reference.json` as source of truth.
+- Categories are normalized for readability.
+- Descriptions/parameters are best-effort; validate inputs before calling.
+- Always include retry/backoff for 429/5xx; Mimecast may throttle.
+- Authenticate with a bearer token in the `Authorization` header; obtain it using your `ClientId`/`ClientSecret`.
 
 ## Next updates
 - Re-run the scraper when Mimecast updates docs (use `api-docs-scraper/run_sections.py`).
