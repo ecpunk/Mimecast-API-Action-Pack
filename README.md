@@ -22,6 +22,12 @@ https://developer.services.mimecast.com/
 3) Open `api-reference.json` to find the endpoint you need (or search programmatically).
 4) Run one of the example scripts and adjust `TargetMethod`/`TargetPath`.
 
+### Optional: search endpoints with the finder
+```bash
+python3 tools/find_endpoint.py blocked senders --limit 5
+python3 tools/find_endpoint.py quarantine --category "Email Security Onboarding"
+```
+
 ## VS Code workflow
 1) Open this folder in VS Code. Install extensions: PowerShell and/or Python.
 2) Configure your environment:
@@ -47,7 +53,7 @@ endpoint = next(e for e in data['endpoints'] if e['path']=='/api/account/cloud-g
 ```
 
 ## Asking AI for a script
-If you use an AI assistant, see `AI_GUIDE.md` for prompts and assumptions tailored for script generation.
+If you use an AI assistant, see `AI_GUIDE.md` and `PROMPTS.md` for ready-to-copy prompts and assumptions.
 
 ## Notes & best practices
 - Use `path` and `method` from `api-reference.json` as source of truth.
