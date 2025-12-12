@@ -58,13 +58,35 @@ function Invoke-MimecastApi {
     }
 }
 
+function Get-MimecastToken {
+    param(
+        [string]$BaseUrl,
+        [string]$ClientId,
+        [string]$ClientSecret
+    )
+    # If an env token is present, use it
+    if ($env:MIMECAST_TOKEN) { return $env:MIMECAST_TOKEN }
+
+    # Placeholder token acquisition flow: update the auth URL and payload to match Mimecast documentation for your tenant.
+    # Common pattern: client credentials grant to obtain a bearer token.
+    $authUri = "$BaseUrl/oauth/token"  # TODO: verify the correct auth endpoint for Mimecast
+    $payload = @{ grant_type = 'client_credentials'; client_id = $ClientId; client_secret = $ClientSecret }
+
+    try {
+        $resp = Invoke-RestMethod -Method POST -Uri $authUri -Body $payload -ContentType 'application/x-www-form-urlencoded' -ErrorAction Stop
+        if ($resp.access_token) { return $resp.access_token }
+        throw "Token response missing access_token"
+    } catch {
+        throw "Failed to acquire token. Update Get-MimecastToken with the correct endpoint per Mimecast docs: $($_.Exception.Message)"
+    }
+}
+
 # MAIN
 $creds = Get-CredentialsJson -Path $CredsPath
 $endpoint = Get-Endpoint -ApiPath $TargetPath -Method $TargetMethod -JsonPath $ApiRefPath
 
 # TODO: Replace this with your actual token acquisition flow
-$token = $env:MIMECAST_TOKEN
-if (-not $token) { throw "Set MIMECAST_TOKEN environment variable with a valid bearer token." }
+$token = Get-MimecastToken -BaseUrl $creds.BaseUrl -ClientId $creds.ClientId -ClientSecret $creds.ClientSecret
 
 # Example body (edit per endpoint parameters)
 $body = @{}

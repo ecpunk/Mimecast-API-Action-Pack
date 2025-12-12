@@ -4,7 +4,7 @@ This file is designed for AI assistants to generate working scripts using `api-r
 
 ## Assumptions
 - All requests require authentication via a bearer token in `Authorization: Bearer <token>`.
-- Token acquisition can be performed using `ClientId`/`ClientSecret` provided by the user or assumed to be available as `MIMECAST_TOKEN`.
+- Token acquisition must be handled by the generated script: use `ClientId`/`ClientSecret` from `credentials.json` to obtain a bearer token, or use `MIMECAST_TOKEN` if present.
 - Use `path` and `method` from `api-reference.json` exactly as provided.
 - Include exponential backoff and retries for `429` and `5xx` responses.
 - Validate required parameters if present in `parameters`.

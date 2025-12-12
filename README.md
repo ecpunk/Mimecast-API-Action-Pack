@@ -18,7 +18,7 @@ https://developer.services.mimecast.com/
 
 ## Quick start
 1) Copy `credentials.json.template` to `credentials.json` and set `ClientId` / `ClientSecret`.
-2) Ensure you have an access token (bearer) available. You can set it via environment variable `MIMECAST_TOKEN` or implement a token acquisition step in your script.
+2) Scripts will acquire a bearer token automatically using `ClientId`/`ClientSecret` (or use `MIMECAST_TOKEN` if set). No manual token handling required.
 3) Open `api-reference.json` to find the endpoint you need (or search programmatically).
 4) Run one of the example scripts and adjust `TargetMethod`/`TargetPath`.
 
