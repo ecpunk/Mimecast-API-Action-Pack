@@ -2,22 +2,39 @@
 
 This pack provides a curated API reference (`api-reference.json`) and starter scripts so you can quickly call Mimecast APIs from PowerShell or Python.
 
+---
+
+## 🚀 Quick Setup with AI (Copy & Paste)
+If you want to set up a new VS Code workspace using this repo, paste this into your AI assistant (Claude, Copilot, etc.):
+
+> I want to create a new VS Code workspace using the GitHub repository https://github.com/ecpunk/Mimecast-API-Action-Pack as the basis. Please:
+> 1. Clone the repo
+> 2. Create a Python virtual environment (`.venv`)
+> 3. Run `setup-credentials.ps1` (or `python -m pip install requests` if on Python)
+> 4. Verify the example scripts can find the credentials
+> 5. Show me how to test the setup by running one of the example scripts
+> 6. Give me next steps to call a real Mimecast API endpoint
+
+---
+
 ## Contents
 - `api-reference.json` — 257 endpoints with name, category, method, path, description, parameters, url, last_updated.
-- `credentials.json.template` — fill in `ClientId` and `ClientSecret`, save as `credentials.json`.
+- `credentials.json.template` — template for API credentials (use `setup-credentials.ps1` to generate).
+- `setup-credentials.ps1` — interactive script to create `credentials.json` with your Client ID and Secret.
 - `examples/powershell-basic.ps1` — load JSON, select endpoint, call it with retry/backoff.
 - `examples/python-basic.py` — same flow in Python `requests`.
 
 ## Prerequisites
 - A Mimecast API application with `ClientId` and `ClientSecret`.
-- Access to Mimecast’s API environment and permissions to call the selected endpoints.
+- Access to Mimecast's API environment and permissions to call the selected endpoints.
 - Recommended: VS Code with PowerShell or Python extensions.
 
-Refer to Mimecast’s official documentation to set up API credentials:
+Refer to Mimecast's official documentation to set up API credentials:
 https://developer.services.mimecast.com/
 
 ## Quick start
-1) Copy `credentials.json.template` to `credentials.json` and set `ClientId` / `ClientSecret`.
+1) Run `./setup-credentials.ps1` to interactively create `credentials.json` with your Client ID and Secret.
+   - Or manually: Copy `credentials.json.template` to `credentials.json` and edit in your credentials.
 2) Scripts will acquire a bearer token automatically using `ClientId`/`ClientSecret` (or use `MIMECAST_TOKEN` if set). No manual token handling required.
 3) Open `api-reference.json` to find the endpoint you need (or search programmatically).
 4) Run one of the example scripts and adjust `TargetMethod`/`TargetPath`.
@@ -65,3 +82,4 @@ If you use an AI assistant, see `AI_GUIDE.md` and `PROMPTS.md` for ready-to-copy
 ## Next updates
 - Re-run the scraper when Mimecast updates docs (use `api-docs-scraper/run_sections.py`).
 - Extend examples if you need multipart uploads or pagination helpers.
+

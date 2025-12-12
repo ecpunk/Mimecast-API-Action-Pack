@@ -7,10 +7,31 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
+function Resolve-CredentialsPath {
+    param([string]$Path)
+    
+    # If path exists as-is, use it
+    if (Test-Path $Path) { return (Resolve-Path $Path).Path }
+    
+    # Try relative to script directory
+    $scriptDir = Split-Path -Parent $PSCommandPath
+    $scriptRelative = Join-Path $scriptDir $Path
+    if (Test-Path $scriptRelative) { return (Resolve-Path $scriptRelative).Path }
+    
+    # Try in parent directory of script location
+    $parentDir = Split-Path -Parent $scriptDir
+    $parentRelative = Join-Path $parentDir "credentials.json"
+    if (Test-Path $parentRelative) { return (Resolve-Path $parentRelative).Path }
+    
+    # Not found
+    return $null
+}
+
 function Get-CredentialsJson {
     param([string]$Path)
-    if (!(Test-Path $Path)) { throw "Credentials file not found: $Path" }
-    return Get-Content $Path | ConvertFrom-Json
+    $resolvedPath = Resolve-CredentialsPath $Path
+    if (!$resolvedPath) { throw "Credentials file not found. Tried: $Path, and local directories. Run setup-credentials.ps1 first." }
+    return Get-Content $resolvedPath | ConvertFrom-Json
 }
 
 function Get-Endpoint {
@@ -93,3 +114,4 @@ $body = @{}
 
 $response = Invoke-MimecastApi -BaseUrl $creds.BaseUrl -Token $token -Method $endpoint.method -Path $endpoint.path -Body $body
 $response | ConvertTo-Json -Depth 6
+
