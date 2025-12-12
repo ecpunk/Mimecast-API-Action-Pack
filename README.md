@@ -13,6 +13,14 @@ This bundle gives humans and AI a ready-to-use reference plus starter scripts to
 2) Open `api-reference.json` to find the endpoint you need (or search programmatically).
 3) Run one of the example scripts and adjust `target_method`/`target_path`.
 
+## VS Code + AI flow (fast)
+1) Open this folder in VS Code. Install extensions: PowerShell, Python, and GitHub Copilot Chat (or your AI chat extension).
+2) In the chat, say you have `api-reference.json` open and ask for a script. Examples:
+    - "Make a simple API script to call `POST /api/...` with these parameters: ..."
+    - "Make an API script that pulls all blocked senders, finds common domains, and outputs the top 10." 
+    - "Find the endpoint to list URL blocks and generate a PowerShell script with retries and basic logging."
+3) If the script needs auth, point it to `credentials.json` or provide `MIMECAST_TOKEN` env var. Ask the AI to include retry/backoff for 429/5xx.
+
 ## Loading the JSON
 **PowerShell**
 ```powershell
