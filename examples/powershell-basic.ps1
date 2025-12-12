@@ -1,0 +1,73 @@
+param(
+    [string]$ApiRefPath = "../api-reference.json",
+    [string]$CredsPath = "../credentials.json",
+    [string]$TargetMethod = "GET",
+    [string]$TargetPath = "/api/account/cloud-gateway/v1/emergency-contact"
+)
+
+$ErrorActionPreference = 'Stop'
+
+function Get-CredentialsJson {
+    param([string]$Path)
+    if (!(Test-Path $Path)) { throw "Credentials file not found: $Path" }
+    return Get-Content $Path | ConvertFrom-Json
+}
+
+function Get-Endpoint {
+    param([string]$ApiPath, [string]$Method, [string]$JsonPath)
+    $data = Get-Content $JsonPath | ConvertFrom-Json
+    $match = $data.endpoints | Where-Object { $_.path -eq $ApiPath -and $_.method -eq $Method } | Select-Object -First 1
+    if (-not $match) { throw "Endpoint not found for $Method $ApiPath" }
+    return $match
+}
+
+function Invoke-WithRetry {
+    param(
+        [scriptblock]$Action,
+        [int]$MaxAttempts = 4,
+        [int]$BaseDelayMs = 500
+    )
+    for ($i=1; $i -le $MaxAttempts; $i++) {
+        try {
+            return & $Action
+        } catch {
+            $status = $_.Exception.Response.StatusCode.value__
+            if ($status -in 429,500,502,503,504 -and $i -lt $MaxAttempts) {
+                $delay = [int]($BaseDelayMs * [math]::Pow(2, $i-1))
+                Start-Sleep -Milliseconds $delay
+                continue
+            }
+            throw
+        }
+    }
+}
+
+function Invoke-MimecastApi {
+    param(
+        [string]$BaseUrl,
+        [string]$Token,
+        [string]$Method,
+        [string]$Path,
+        [hashtable]$Body = @{}
+    )
+    $uri = "$BaseUrl$Path"
+    $json = if ($Body.Count -gt 0) { $Body | ConvertTo-Json -Depth 6 } else { $null }
+
+    Invoke-WithRetry {
+        Invoke-RestMethod -Method $Method -Uri $uri -Headers @{ Authorization = "Bearer $Token" } -ContentType 'application/json' -Body $json -ErrorAction Stop
+    }
+}
+
+# MAIN
+$creds = Get-CredentialsJson -Path $CredsPath
+$endpoint = Get-Endpoint -ApiPath $TargetPath -Method $TargetMethod -JsonPath $ApiRefPath
+
+# TODO: Replace this with your actual token acquisition flow
+$token = $env:MIMECAST_TOKEN
+if (-not $token) { throw "Set MIMECAST_TOKEN environment variable with a valid bearer token." }
+
+# Example body (edit per endpoint parameters)
+$body = @{}
+
+$response = Invoke-MimecastApi -BaseUrl $creds.BaseUrl -Token $token -Method $endpoint.method -Path $endpoint.path -Body $body
+$response | ConvertTo-Json -Depth 6
