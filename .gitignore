@@ -1,0 +1,15 @@
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+.vscode/
+.env
+
+# Do not commit secrets or local creds
+credentials.json
+
+# Ignore generated debug outputs
+examples/*.debug.json
+
+# Python notebook checkpoints
+.ipynb_checkpoints/

@@ -1,0 +1,9 @@
+{
+  "notes": [
+    {
+      "method": "GET",
+      "path": "/identity/whoami",
+      "note": "Restricted to partner accounts; may not be available for standard tenants."
+    }
+  ]
+}
