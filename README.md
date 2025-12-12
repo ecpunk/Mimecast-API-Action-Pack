@@ -1,22 +1,17 @@
 # Mimecast API Action Pack
-
 Curated Mimecast API reference (257 endpoints) with starter scripts for PowerShell and Python.
 
 ## Quick Start: Two Steps
 
 ### Step 1: Generate New Workspace
-
 Paste this into your AI assistant **inside VS Code**:
-
 ```
 Create and open a new VS Code workspace.
-
 Workspace details:
 - Name: Mimecast-API-Action-Pack
 - Location: ~/dev
 - Source repository:
   https://github.com/ecpunk/Mimecast-API-Action-Pack
-
 Rules:
 - Create ~/dev if it does not exist
 - Open the workspace immediately
@@ -25,9 +20,7 @@ Rules:
 ```
 
 ### Step 2: Bootstrap the Workspace
-
 Once the workspace is open, paste this into your AI assistant:
-
 ```
 You are running inside the Mimecast-API-Action-Pack VS Code workspace. Tasks:
 1. Create a Python virtual environment named .venv in the workspace root.
@@ -36,7 +29,6 @@ You are running inside the Mimecast-API-Action-Pack VS Code workspace. Tasks:
 4. Create credentials.json by copying credentials.json.template.
 5. Verify api-reference.json exists.
 6. Stop.
-
 Do NOT:
 - Open or generate another workspace
 - Explain steps
@@ -46,67 +38,29 @@ Do NOT:
 ```
 
 ## What's Included
-
-- **api-reference.json** — 257 endpoints with method, path, description, parameters, and category
-- **credentials.json.template** — Template for storing your API credentials
-- **setup-credentials.ps1** — Interactive PowerShell script to generate credentials
-- **examples/powershell-basic.ps1** — Basic PowerShell endpoint call with retry/backoff
-- **examples/python-basic.py** — Basic Python endpoint call with requests library
+- **api-reference.json** — 257 Mimecast endpoints with method, path, description, and parameters
+- **credentials.json.template** — Template for your API credentials
+- **examples/** — Starter scripts for PowerShell and Python
 
 ## Prerequisites
-
 - Mimecast API application credentials (ClientId and ClientSecret)
 - VS Code with PowerShell or Python extensions (recommended)
 
 Get API credentials: https://developer.services.mimecast.com/
 
-## Using the API
+## How to Use
+Ask your AI assistant what you can do with the endpoints. It has access to `api-reference.json` and can:
+- Find endpoints matching your use case
+- Write and run scripts to call them
+- Handle authentication and error handling automatically
 
-1. **Find your endpoint** — Search `api-reference.json` for the operation you need
-2. **Modify the example script** — Update `TargetMethod` and `TargetPath` to match
-3. **Add your request body** — Include any parameters the endpoint requires
-4. **Run the script** — Bearer token is acquired automatically from your credentials
-
-### Example: Search endpoints
-
-```bash
-python3 tools/find_endpoint.py quarantine --limit 5
-python3 tools/find_endpoint.py blocked --category "Email Security"
-```
-
-## Loading and Querying the API Reference
-
-**PowerShell**
-```powershell
-$data = Get-Content ./api-reference.json | ConvertFrom-Json
-$endpoint = $data.endpoints | Where-Object { $_.path -eq '/api/email-security/quarantine/v1/list' } | Select-Object -First 1
-```
-
-**Python**
-```python
-import json
-with open('api-reference.json') as f:
-    data = json.load(f)
-endpoint = next((e for e in data['endpoints'] if '/quarantine/' in e['path']), None)
-```
+Example prompts:
+- "What can I do with quarantine endpoints?"
+- "Show me how to list blocked senders"
+- "Can I retrieve audit logs? Show me how"
 
 ## Notes
-
-- Token acquisition is handled automatically in both PowerShell and Python examples
-- Include retry/backoff (429/5xx) for production use — Mimecast may throttle
-- See `api-reference.json` for the definitive method and path for each endpoint
-- Endpoint descriptions and parameters are best-effort; validate before calling
-
-## Keeping It Updated
-
-Re-run the scraper when Mimecast updates their documentation:
-
-```bash
-python3 api-docs-scraper/run_sections.py
-```
-
-## Need Help?
-
-- Review the example scripts in `examples/`
-- Check endpoint details in `api-reference.json`
-- Refer to Mimecast's official docs: https://developer.services.mimecast.com/
+- Token acquisition is handled automatically
+- Mimecast may throttle requests (429/5xx) — AI will handle retries
+- Endpoint descriptions are best-effort; validate against Mimecast's official docs
+- Refer to Mimecast's official API docs: https://developer.services.mimecast.com/
