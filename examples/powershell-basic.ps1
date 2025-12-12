@@ -2,7 +2,7 @@ param(
     [string]$ApiRefPath = "../api-reference.json",
     [string]$CredsPath = "../credentials.json",
     [string]$TargetMethod = "GET",
-    [string]$TargetPath = "/api/account/cloud-gateway/v1/emergency-contact"
+    [string]$TargetPath = "/account/cloud-gateway/v1/emergency-contact"
 )
 
 $ErrorActionPreference = 'Stop'
@@ -34,9 +34,31 @@ function Get-CredentialsJson {
     return Get-Content $resolvedPath | ConvertFrom-Json
 }
 
+function Resolve-ApiReferencePath {
+    param([string]$Path)
+    
+    # If path exists as-is, use it
+    if (Test-Path $Path) { return (Resolve-Path $Path).Path }
+    
+    # Try relative to script directory
+    $scriptDir = Split-Path -Parent $PSCommandPath
+    $scriptRelative = Join-Path $scriptDir $Path
+    if (Test-Path $scriptRelative) { return (Resolve-Path $scriptRelative).Path }
+    
+    # Try in parent directory of script location
+    $parentDir = Split-Path -Parent $scriptDir
+    $parentRelative = Join-Path $parentDir "api-reference.json"
+    if (Test-Path $parentRelative) { return (Resolve-Path $parentRelative).Path }
+    
+    # Not found
+    return $null
+}
+
 function Get-Endpoint {
     param([string]$ApiPath, [string]$Method, [string]$JsonPath)
-    $data = Get-Content $JsonPath | ConvertFrom-Json
+    $resolvedPath = Resolve-ApiReferencePath $JsonPath
+    if (!$resolvedPath) { throw "API reference file not found. Tried: $JsonPath, and local directories." }
+    $data = Get-Content $resolvedPath | ConvertFrom-Json
     $match = $data.endpoints | Where-Object { $_.path -eq $ApiPath -and $_.method -eq $Method } | Select-Object -First 1
     if (-not $match) { throw "Endpoint not found for $Method $ApiPath" }
     return $match
@@ -114,4 +136,3 @@ $body = @{}
 
 $response = Invoke-MimecastApi -BaseUrl $creds.BaseUrl -Token $token -Method $endpoint.method -Path $endpoint.path -Body $body
 $response | ConvertTo-Json -Depth 6
-
